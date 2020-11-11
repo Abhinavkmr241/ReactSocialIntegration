@@ -1,24 +1,32 @@
-import logo from './logo.svg';
+import React from "react";
+import { BrowserRouter as Router, Route, Switch, Redirect } from "react-router-dom";
+import { ToastsContainer, ToastsStore, ToastsContainerPosition } from "react-toasts";
 import './App.css';
+import { store, persistor } from "./redux/store";
+import { PersistGate } from "redux-persist/integration/react";
+import { Provider } from "react-redux";
+import PublicRoute from '../src/routes/public-route';
+import ProtectedRoute from '../src/routes/protected-routes';
+import HomePage from './components/HomePage';
+import Profile from './components/Profile';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Provider store={store}>
+      <PersistGate persistor={persistor}>
+        <Router>
+          <div className="App">
+            <ToastsContainer store={ToastsStore} position={ToastsContainerPosition.BOTTOM_RIGHT} />
+            <Switch>
+              <PublicRoute exact path="/" component={HomePage} redirectRoute={"/profile"} />
+              <ProtectedRoute exact path="/profile" component={Profile} redirectRoute={"/"}/>
+
+              <Route path="*" render={() => <Redirect to="/" />} />
+            </Switch>
+          </div>
+        </Router>
+      </PersistGate>
+    </Provider>
   );
 }
 
